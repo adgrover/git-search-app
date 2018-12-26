@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 
 import { RequestDispatcher } from "./request-dispatcher.service";
-import { RequestPayload } from "../models/request-payload";
+import { RequestPayload, IdPayload } from "../models/request-payload";
 
 @Injectable()
 export class MainService{
@@ -11,5 +11,13 @@ export class MainService{
 
     getServiceResponse(req: RequestPayload){
         return this.request.postRequest(req, 'search');
+    }
+
+    saveTheId(req : IdPayload){
+        return this.request.postRequest(req, 'addId');
+    }
+
+    getIds(req : IdPayload){
+        return this.request.postRequest(req, 'getIds');
     }
 }

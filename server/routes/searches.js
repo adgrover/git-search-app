@@ -4,7 +4,7 @@ const axios = require('axios');
 const stringify = require('json-stringify-safe');
 // const RequestSchema = require('../models/request');
 // const config = require('../config/database');
-// const User = require('../models/user');
+const Id = require('../models/id');
 
 // Register
 router.post('/search', (req, res, next) => {
@@ -13,7 +13,15 @@ router.post('/search', (req, res, next) => {
     owner: req.body.owner,
     repo: req.body.repo
   };
-  let url = 'https://api.github.com/search/repositories?q='+ newRequest.repo +'+language:'+ newRequest.language +'&sort=stars&order=desc'
+
+  let url = '';
+
+  if (newRequest.owner){
+    url = 'https://api.github.com/search/repositories?q='+ newRequest.repo +'+language:'+ newRequest.language +'+user:'+ newRequest.owner +'&sort=stars&order=desc'
+  }else{
+    url = 'https://api.github.com/search/repositories?q='+ newRequest.repo +'+language:'+ newRequest.language +'&sort=stars&order=desc'
+  }
+  // let url = 'https://api.github.com/search/repositories?q='+ newRequest.repo +'+language:'+ newRequest.language +'+user:'+ newRequest.owner +'&sort=stars&order=desc'
   axios.get(url)
   .then(response => {
     let arrayOfIds = [];
@@ -29,13 +37,32 @@ router.post('/search', (req, res, next) => {
     res.json(404, 'Not Found');
   });
 
-  // User.addUser(newUser, (err, user) => {
-  //   if(err) {
-  //     res.json({success: false, msg: 'Failed to register user'});
-  //   } else {
-  //     res.json({success: true, msg: 'User registered'});
-  //   }
-  // });
+});
+
+router.post('/addId', (req,res,next) => {
+  let newId =  new Id({
+    id : req.body.id
+  });
+  Id.addId(newId, (err, id) => {
+    if(err) {
+      res.json({success: false, msg: 'Failed to register ID'});
+    } else {
+      res.json({success: true, msg: 'ID registered'});
+    }
+  });
+});
+
+router.post('/getIds', (req,res,next) => {
+  let newId =  new Id({
+    id : null
+  });
+  Id.findId(newId, (err, ids) => {
+    if(err) {
+      res.json({success: false, msg: 'Failed to register ID'});
+    } else {
+      res.json({ids});
+    }
+  });
 });
 
 module.exports = router;

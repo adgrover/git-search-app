@@ -3,3 +3,7 @@ export class RequestPayload {
 	owner: string
 	repo: string
 }
+
+export class IdPayload {
+	id : number
+}

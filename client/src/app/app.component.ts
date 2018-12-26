@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import { RequestPayload } from "./models/request-payload";
+import { RequestPayload, IdPayload } from "./models/request-payload";
 import { MainService } from "./services/main.service";
 
 import { ResponseClass, Item } from "./models/response.model";
@@ -10,7 +10,7 @@ import { ResponseClass, Item } from "./models/response.model";
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
 
   language: string;
   owner: string;
@@ -22,12 +22,26 @@ export class AppComponent {
     'name', 'url', 'description', 'owner'
   ];
 
+  ids = [];
+
   itemsToDisplay : Item[] = [];
 
   constructor(
     readonly main : MainService
   ){
 
+  }
+
+  ngOnInit(){
+    let id = new IdPayload();
+    this.main.getIds(id).subscribe((data : any) => {
+      for (let item of data.ids){
+        if(!this.ids.includes(item.id)){
+          this.ids.push(item.id);
+        }
+      }
+      console.log(this.ids);
+    });
   }
 
   initiateSearch(){
@@ -40,9 +54,28 @@ export class AppComponent {
     });
   }
 
-  openUrl(url){
+  openUrl(url, id){
     var win = window.open(url, '_blank');
     win.focus(); 
+
+    let idReq = new IdPayload();
+    idReq.id = id
+
+    if(!this.ids.includes(id)){
+      this.ids.push(id);
+      this.main.saveTheId(idReq).subscribe((data : ResponseClass) => {
+        this.itemsToDisplay = data.items;
+      });
+    }
+
+  }
+
+  isAlreadyOpened(id){
+    if(this.ids.includes(id)){
+      return true;
+    }else{
+      return false;
+    }
   }
 
 }
